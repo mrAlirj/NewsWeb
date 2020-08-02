@@ -1,0 +1,101 @@
+
+{% extends "back/master.html" %}
+{% load static %}
+
+{% block mainblock %}
+<div id="page-content">
+    <!-- Datatables Header -->
+    <div class="content-header">
+        <div class="header-section">
+            <h1>
+                <i class="fa fa-table"></i>News List<br><small>you can add, edit and delete your data!</small>
+            </h1>
+        </div>
+    </div>
+    <ul class="breadcrumb breadcrumb-top">
+        <li>News</li>
+        <li><a href="/panel/news/list/">List</a></li>
+    </ul>
+    <!-- END Datatables Header -->
+
+    <!-- Datatables Content -->
+    <div class="block full">
+        <div class="block-title">
+            <h2><strong>News</strong> List</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table id="example-datatable" class="table table-vcenter table-condensed table-bordered">
+                <thead>
+                    <tr>
+                      <th class="text-center">ID</th>
+                        <th class="text-center">Image</th>
+                        <th>Title</th>
+                        <th>Date & Time</th>
+                        <th>Category</th>
+                        <th>Writer</th>
+                        <th>Status</th>
+                        <th>views</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  {% for i in news %}
+
+                  <tr>
+                      <td class="text-center">{{ i.rand }}</td>
+                      <td class="text-center"><img style="display: inline-block; width:50px; height: 50px;" src="{{ i.picurl }}" alt="avatar" class="img-circle"></td>
+                      <td>{{ i.name }}</td>
+                      <td>{{ i.date }} | {{ i.time }}</td>
+                      <td>{{ i.catname }}</td>
+                      <td>{{ i.writer }}</td>
+                      {% if i.act == 0 %}
+                      <td>Pennding</td>
+                      {% elif i.act == 1 %}
+                      <td>Confirmed</td>
+                      {% endif %}
+                      <td class="text-center">
+                          <div class="btn-group">
+                              <a href="{% url 'news_edit' pk=i.id %}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil">Edit</i></a>
+                              <a href="{% url 'news_delete' pk=i.id %}" data-toggle="tooltip" title="Delete" class="btn btn-xs btn-danger"><i class="fa fa-times">Delete</i></a>
+                              {% if perms.main.masteruser %}
+                              <a href="{% url 'news_publish' pk=i.id %}" data-toggle="tooltip" title="Edit" class="btn btn-xs btn-default"><i class="fa fa-pencil">Publish</i></a>
+                              {% endif %}
+                          </div>
+                      </td>
+                  </tr>
+
+                  {% endfor %}
+
+                </tbody>
+            </table>
+            Page {{ news.number }} from {{ news.paginator.num_pages }}
+            <br><br>
+            {% if news.has_previous %}
+            <a href="?page={{ news.previous_page_number }}" data-toggle="Previous" title="Edit" class="btn btn-xs btn-default">Previous</a>
+            {% endif %}
+
+            {% for i in news.paginator.page_range %}
+            {{ forloop.counter|add:100}}
+              {% if news.number == i %}
+                <a href="#" onclick="return false;" data-toggle="tooltip" title="{{ Disables }}" class="btn btn-xs btn-default">{{ i }}</a>
+              {% else %}
+                <a href="?page={{ i }}" data-toggle="tooltip" title="{{ i }}" class="btn btn-xs btn-default">{{ i }}</a>
+              {% endif %}
+            {% endfor %}
+
+            {% if news.has_next %}
+            <a href="?page={{ news.next_page_number }}" data-toggle="Next" title="Next" class="btn btn-xs btn-default">Next</a>
+            {% endif %}
+        </div>
+    </div>
+    <!-- END Datatables Content -->
+</div>
+<!-- END Page Content -->
+{% endblock %}
+
+{% block footerblock %}
+    <!-- Load and execute javascript code used only in this page -->
+    <script src="{% static "back/js/pages/tablesDatatables.js" %}"></script>
+    <script>$(function(){ TablesDatatables.init(); });</script>
+{% endblock %}
